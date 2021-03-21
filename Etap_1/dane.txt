@@ -1,13 +1,13 @@
 nazwiska, imiona, adresy mailowe oraz numery grup członków zespołu:
-	Słaby Adam, adsa3202@gmail.com, Grupa jeszcze nie przydzielona
+	Słaby Adam, adsa3202@gmail.com, 1ID22B
 temat projektu:
 	Temat projektu: 27. Modelowanie bazy danych,
 Spis używanych technologii: 
 	Angular, Sprig boot
 Harmonogram pracy:
-	(do 10 kwietnia)-> możliwość tworzenia tabel oraz możliwość dodawania relacji
-	(do 10 maja)-> możliwość dodawania atrybutów a także w przypadku relacji wiele do wielu tworzenie dodatkowej tabeli
-	(do 10 czerwca) -> możliwość wygenerowania kodu sql na podstawie diagramu oraz możliwość zapisywania oraz wczytywania 
+	(do 10 kwietnia)-> możliwość tworzenia tabel oraz możliwość dodawania atrybutów
+	(do 10 maja)-> możliwość dodawania relacji pomiędzy tabelami a także w przypadku relacji wiele do wielu tworzenie dodatkowej tabeli
+	(do 10 czerwca)-> możliwość wygenerowania kodu sql na podstawie diagramu oraz możliwość zapisywania oraz wczytywania 
 			   diagramów
 
 Temat projektu z przedmiotu "Programowanie systemów rozproszonych": Sieciowa gra Memory
