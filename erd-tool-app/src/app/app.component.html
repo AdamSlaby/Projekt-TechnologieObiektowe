@@ -1,0 +1,49 @@
+<div class="container-fluid">
+
+  <header class="row bg-primary mb-2">
+    <fa-icon [icon]="faProjectDiagram" size="2x" class="p-3"></fa-icon>
+    <h3 class="my-auto">ERD designer</h3>
+  </header>
+
+  <section>
+    <div class="row">
+      <div class="col-3 pl-0">
+        <accordion [isAnimated]="true">
+          <accordion-group heading="Entity">
+            <button class="btn" (click)="addTableToGraph()">
+              <fa-icon [icon]="faTable" size="2x"></fa-icon>
+            </button>
+          </accordion-group>
+          <accordion-group heading="Relationship">
+            <button class="btn mr-2">
+
+            </button>
+            <button class="btn mr-2">
+
+            </button>
+            <button class="btn">
+
+            </button>
+          </accordion-group>
+          <accordion-group heading="Inheritance">
+            <button class="btn">
+
+            </button>
+          </accordion-group>
+        </accordion>
+      </div>
+
+      <div #graphContainer style="min-height: 55rem" class="col-9 grid">
+        <div class="menu">
+          <ul class="menu-options">
+            <li class="menu-option">Back</li>
+            <li class="menu-option">Reload</li>
+            <li class="menu-option">Save</li>
+            <li class="menu-option">Save As</li>
+            <li class="menu-option">Inspect</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

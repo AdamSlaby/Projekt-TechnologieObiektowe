@@ -12,6 +12,7 @@
     "importHelpers": true,
     "target": "es2015",
     "typeRoots": [
+      "node_modules/mxgraph-type-definitions",
       "node_modules/@types"
     ],
     "lib": [

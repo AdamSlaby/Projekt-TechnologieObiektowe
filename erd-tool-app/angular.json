@@ -21,16 +21,18 @@
             "aot": true,
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              {
+                "glob": "**/*",
+                "input": "./node_modules/mxgraph/javascript/src",
+                "output": "./assets/mxgraph"
+              }
             ],
             "styles": [
-              "src/styles.css",
-              { "glob": "**/*", "input": "src/assets/", "output": "/assets/" },
-              { "glob": "favicon.ico", "input": "/src", "output": "/" },
-              { "glob": "**/*", "input": "./node_modules/mxgraph/javascript/src", "output": "/assets/mxgraph" }
+              "src/styles.css"
             ],
             "scripts": [
-              "src/assets/js/mxgraph.conf.js",
+              "src/config/mxgraph-config.js",
               "node_modules/mxgraph/javascript/mxClient.js"
             ]
           },

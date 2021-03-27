@@ -1,27 +1,55 @@
 import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
-import {mxgraph} from 'mxgraph';
-import mxGraph = mxgraph.mxGraph;
-import mxHierarchicalLayout = mxgraph.mxHierarchicalLayout;
+import {faProjectDiagram, faTable} from '@fortawesome/free-solid-svg-icons';
+import {Styles} from './vertex-styles';
+
+declare var mxGraph: any;
+declare var mxConstants: any;
+declare var mxStyleChange: any;
+declare var mxHierarchicalLayout: any;
+declare var mxEvent: any;
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
+
 export class AppComponent implements AfterViewInit {
-  title = 'erd-tool-app';
+  faTable = faTable;
+  faProjectDiagram = faProjectDiagram;
+  graph;
+  style = new Object();
   @ViewChild('graphContainer') graphContainer: ElementRef;
   ngAfterViewInit() {
-    const newGraph = new mxGraph(this.graphContainer.nativeElement);
+    this.graph = new mxGraph(this.graphContainer.nativeElement);
+
+    this.style[mxConstants.STYLE_SHAPE] = 'box';
+    this.style[mxConstants.STYLE_STROKECOLOR] = '#000000';
+    this.style[mxConstants.STYLE_FILLCOLOR] = '#FFFFFF';
+    this.style[mxConstants.DEFAULT_STARTSIZE] = 10;
+    this.style[mxConstants.STYLE_FONTCOLOR] = '#000000';
+    this.graph.getStylesheet().putCellStyle('boxstyle', this.style);
+
+    window.addEventListener('contextmenu', e => {
+      e.preventDefault();
+    });
+
+    this.graph.addListener(mxEvent.CLICK, (sender, evt) => {
+      const vertexID = evt.getProperty('cell');
+      if (vertexID ) {
+
+      }
+    });
+  }
+
+  addTableToGraph() {
     try {
-      const parent = newGraph.getDefaultParent();
-      newGraph.getModel().beginUpdate();
-      const vertex1 = newGraph.insertVertex(parent, '1', 'Vertex 1', 0, 0, 200, 80);
-      const vertex2 = newGraph.insertVertex(parent, '2', 'Vertex 2', 0, 0, 200, 80);
-      newGraph.insertEdge(parent, '', '', vertex1, vertex2);
+      const parent = this.graph.getDefaultParent();
+      this.graph.getModel().beginUpdate();
+      const entity = this.graph.insertVertex(parent, null, 'Entity', 0, 0, 200, 80, 'boxstyle');
+      entity.getStyle();
     } finally {
-      newGraph.getModel().endUpdate();
-      new mxHierarchicalLayout(newGraph).execute(newGraph.getDefaultParent());
+      this.graph.getModel().endUpdate();
     }
   }
 }
