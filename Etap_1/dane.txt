@@ -3,7 +3,7 @@ nazwiska, imiona, adresy mailowe oraz numery grup członków zespołu:
 temat projektu:
 	Temat projektu: 27. Modelowanie bazy danych,
 Spis używanych technologii: 
-	Angular, Sprig boot
+	Angular, Bootstrap, mxGraph
 Harmonogram pracy:
 	(do 10 kwietnia)-> możliwość tworzenia tabel oraz możliwość dodawania atrybutów
 	(do 10 maja)-> możliwość dodawania relacji pomiędzy tabelami a także w przypadku relacji wiele do wielu tworzenie dodatkowej tabeli
