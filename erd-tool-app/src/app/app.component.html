@@ -9,40 +9,31 @@
     <div class="row">
       <div class="col-3 pl-0">
         <accordion [isAnimated]="true">
-          <accordion-group heading="Entity">
-            <button class="btn" (click)="addTableToGraph()">
+          <accordion-group heading="Encje">
+            <button class="btn" (click)="addTableToGraph()" tooltip="Encja">
               <fa-icon [icon]="faTable" size="2x"></fa-icon>
             </button>
           </accordion-group>
-          <accordion-group heading="Relationship">
-            <button class="btn mr-2">
-
+          <accordion-group heading="Relacje">
+            <button class="btn mr-2" tooltip="Jeden do jeden">
+              <img alt="one-to-one" src="assets/one-to-one.svg" width="50px" height="50px"/>
             </button>
-            <button class="btn mr-2">
-
+            <button class="btn mr-2" tooltip="Jeden do wielu">
+              <img alt="one-to-many" src="assets/one-to-many.svg" width="50px" height="50px"/>
             </button>
-            <button class="btn">
-
+            <button class="btn" tooltip="Wiele do wielu">
+              <img alt="many-to-many" src="assets/many-to-many.svg" width="50px" height="50px"/>
             </button>
           </accordion-group>
-          <accordion-group heading="Inheritance">
-            <button class="btn">
-
+          <accordion-group heading="Dziedziczenie">
+            <button class="btn" tooltip="Relacja dziedziczenia">
+              <img alt="inheritance" src="assets/inheritance.png" width="100px" height="40px"/>
             </button>
           </accordion-group>
         </accordion>
       </div>
 
       <div #graphContainer style="min-height: 55rem" class="col-9 grid">
-        <div class="menu">
-          <ul class="menu-options">
-            <li class="menu-option">Back</li>
-            <li class="menu-option">Reload</li>
-            <li class="menu-option">Save</li>
-            <li class="menu-option">Save As</li>
-            <li class="menu-option">Inspect</li>
-          </ul>
-        </div>
       </div>
     </div>
   </section>
