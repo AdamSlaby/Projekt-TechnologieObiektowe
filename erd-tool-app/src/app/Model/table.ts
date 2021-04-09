@@ -12,12 +12,13 @@ export class Table {
   }
 
   getTableCell() {
-    const table = new mxCell(this, new mxGeometry(0, 0, 200, 28), 'table');
+    const table = new mxCell(this, new mxGeometry(0, 0, 200, 30), 'table');
     table.setVertex(true);
 
-    const column = new Column('ColumnId');
-    column.primaryKey = true;
-    table.insert(column.getDefaultColumnCell());
+    const columnObject = new Column('ColumnId');
+    const column = columnObject.getDefaultColumnCell().clone();
+    column.value.primaryKey = true;
+    table.insert(column);
     return table;
   }
 

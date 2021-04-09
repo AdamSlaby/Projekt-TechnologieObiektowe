@@ -1,5 +1,7 @@
+
 declare var mxCell: any;
 declare var mxGeometry: any;
+declare var mxUtils: any;
 
 export class Column {
   name: string;
@@ -21,9 +23,13 @@ export class Column {
   }
 
   getDefaultColumnCell() {
-    const column = new mxCell(this, new mxGeometry(0, 0, 0, 26));
+    const column = new mxCell(this, new mxGeometry(0, 0, 0, 30));
     column.setVertex(true);
     column.setConnectable(false);
     return column;
+  }
+
+  clone() {
+    return mxUtils.clone(this);
   }
 }
