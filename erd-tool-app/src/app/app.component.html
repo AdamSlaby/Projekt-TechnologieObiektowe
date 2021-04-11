@@ -7,7 +7,7 @@
 
   <section>
     <div class="row">
-      <div class="col-3 pl-0">
+      <div class="col-2 pl-0">
         <accordion [isAnimated]="true">
           <accordion-group heading="Encje">
             <button class="btn" (click)="addTableToGraph()" tooltip="Encja">
@@ -33,7 +33,64 @@
         </accordion>
       </div>
 
-      <div #graphContainer style="min-height: 55rem" class="col-9 grid">
+      <div #graphContainer [ngClass]="isColumnClicked ? 'col-7' : 'col-10'" style="min-height: 55rem" class="grid">
+      </div>
+
+      <div *ngIf="isColumnClicked" style="min-height: 55rem" class="col-3" [ngStyle]="{'z-index' : 10000}">
+        <h3 class="text-center mt-2">Tabela {{chosenTableName}}</h3>
+        <form (ngSubmit)="f.form.valid && saveColumn()" #f="ngForm">
+          <label class="col-form-label"
+                 for="nameInput">Nazwa kolumny</label>
+          <input class="form-control"
+                 id="nameInput"
+                 [(ngModel)]="column.name"
+                 name="columnName"
+                 [ngClass] = "{'is-invalid': f.submitted && columnName.invalid}"
+                 #columnName="ngModel"
+                 type="text" [value]="column.name" required/>
+          <div *ngIf = "f.submitted && columnName.invalid" class="invalid-feedback">
+            <div *ngIf = "columnName.errors?.required">
+              Musisz podać nazwę kolumny
+            </div>
+          </div>
+
+          <label class="col-form-label"
+                 for="typeSelect">Typ kolumny</label>
+          <select id="typeSelect" class="custom-select" [(ngModel)]="column.type" name="columnType">
+            <option [selected]="type == column.type"
+                    *ngFor="let type of columnTypes">{{type}}</option>
+          </select>
+          <div class="form-check mt-2">
+            <input type="checkbox"
+                   class="form-check-input"
+                   [(ngModel)]="column.primaryKey"
+                   name="primaryKey"
+                   id="primaryKeyCheckbox"
+                   [checked]="column.primaryKey"/>
+            <label class="form-check-label" for="primaryKeyCheckbox">Klucz główny</label>
+          </div>
+          <div class="form-check mt-2">
+            <input type="checkbox"
+                   class="form-check-input"
+                   [(ngModel)]="column.unique"
+                   name="unique"
+                   id="uniqueCheckbox"
+                   [disabled]="column.primaryKey"
+                   [checked]="column.unique"/>
+            <label class="form-check-label" for="uniqueCheckbox">Unique</label>
+          </div>
+          <div class="form-check mt-2">
+            <input type="checkbox"
+                   class="form-check-input"
+                   [(ngModel)]="column.notNull"
+                   name="notNull"
+                   id="notNullCheckbox"
+                   [disabled]="column.primaryKey"
+                   [checked]="column.notNull"/>
+            <label class="form-check-label" for="notNullCheckbox">Not Null</label>
+          </div>
+          <input type="submit" class="btn btn-primary btn-block mt-2" value="Zapisz">
+        </form>
       </div>
     </div>
   </section>

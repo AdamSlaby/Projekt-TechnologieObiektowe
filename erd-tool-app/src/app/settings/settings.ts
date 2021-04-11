@@ -35,7 +35,11 @@ export class Settings {
         return value.clone();
       } else {
         const oldName = cell.value.name;
-        cell.value.name = value;
+        if (value === '') {
+          cell.value.name = oldName;
+        } else {
+          cell.value.name = value;
+        }
         return oldName;
       }
     };
@@ -67,7 +71,7 @@ export class Settings {
           label += '<img alt="not null" src="assets/notNull.png" width="16" height="16" align="top">&nbsp;';
         }
 
-        return label + mxUtils.htmlEntities(cell.value.name, false) + ': type ' +
+        return label + mxUtils.htmlEntities(cell.value.name, false) + ': typ ' +
           mxUtils.htmlEntities(cell.value.type, false);
       }
       if (this.graph.isSwimlane(cell)) {

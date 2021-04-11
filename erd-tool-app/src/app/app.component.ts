@@ -1,13 +1,15 @@
 import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
 import {faProjectDiagram, faTable} from '@fortawesome/free-solid-svg-icons';
 import {Styles} from './styles/vertex-styles';
-import {Column} from './model/column';
 import {Table} from './model/table';
 import {Settings} from './settings/settings';
 import {ContextMenu} from './menu/context-menu';
+import {Utility} from './logic/utility';
+import {ColumnType} from './model/column-type';
 
 declare var mxGraph: any;
 declare var mxEditor: any;
+declare var mxEvent: any;
 declare var mxStackLayout: any;
 declare var mxRectangle: any;
 declare var mxSwimlane: any;
@@ -22,9 +24,14 @@ export class AppComponent implements AfterViewInit {
   faTable = faTable;
   faProjectDiagram = faProjectDiagram;
   editor = new mxEditor();
+  columnTypes = ColumnType.getAllColumnTypes();
+  column;
+  chosenCell;
+  chosenTableName: string;
   graph;
   model;
   settings: Settings;
+  isColumnClicked = false;
 
   @ViewChild('graphContainer') graphContainer: ElementRef;
   ngAfterViewInit() {
@@ -40,7 +47,7 @@ export class AppComponent implements AfterViewInit {
     this.settings.setValueForCell();
     this.settings.setVisibleLabels();
 
-    this.graph.getStylesheet().putDefaultVertexStyle(Styles.getEntityStyle());
+    this.graph.getStylesheet().putDefaultVertexStyle(Styles.getColumnStyle());
     this.graph.getStylesheet().putCellStyle('table', Styles.getTableStyle());
     Styles.setEdgeStyle(this.graph);
 
@@ -62,6 +69,20 @@ export class AppComponent implements AfterViewInit {
       evt.preventDefault();
     }, false);
 
+    this.graph.addListener(mxEvent.CLICK, (sender, evt) => {
+
+      const cell = evt.getProperty('cell');
+      if (cell != null && !this.model.isEdge(cell) && !this.graph.isSwimlane(cell)) {
+        const table = Utility.getTableCell(this.graph, cell);
+        this.chosenTableName = table.value.name;
+        this.chosenCell = cell;
+        this.column = cell.value;
+        this.isColumnClicked = true;
+      } else {
+        this.isColumnClicked = false;
+      }
+      evt.consume();
+    });
 
   }
 
@@ -79,4 +100,8 @@ export class AppComponent implements AfterViewInit {
     }
   }
 
+  saveColumn() {
+    this.graph.getModel().setValue(this.chosenCell, this.column);
+    this.isColumnClicked = false;
+  }
 }

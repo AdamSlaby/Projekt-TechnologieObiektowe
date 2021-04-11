@@ -2,6 +2,8 @@ import {Type} from '../enums/type.enum';
 import {mxgraph} from 'mxgraph';
 import {Column} from '../model/column';
 import {CellType} from '../enums/cell-type.enum';
+import {Utility} from '../logic/utility';
+import {AppComponent} from '../app.component';
 
 export class ContextMenu {
   graph;
@@ -67,7 +69,7 @@ export class ContextMenu {
   }
 
   private addNewColumn(cell) {
-    const parent = this.getCellSwimlane(cell);
+    const parent = Utility.getTableCell(this.graph, cell);
     const columnObject = new Column('ColumnName');
     columnObject.type = 'TEXT';
     const column = columnObject.getDefaultColumnCell();
@@ -76,14 +78,6 @@ export class ContextMenu {
       this.graph.addCell(column, parent);
     } finally {
       this.graph.getModel().endUpdate();
-    }
-  }
-
-  private getCellSwimlane(cell) {
-    if (this.graph.isSwimlane(cell)) {
-      return cell;
-    } else {
-      return cell.getParent();
     }
   }
 

@@ -7,19 +7,21 @@ import { AppRoutingModule } from './app-routing.module';
 import {AccordionModule} from 'ngx-bootstrap/accordion';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import {FormsModule} from '@angular/forms';
 
 @NgModule({
   declarations: [
     AppComponent
   ],
-  imports: [
-    TooltipModule.forRoot(),
-    AccordionModule.forRoot(),
-    BrowserAnimationsModule,
-    BrowserModule,
-    AppRoutingModule,
-    FontAwesomeModule
-  ],
+    imports: [
+        TooltipModule.forRoot(),
+        AccordionModule.forRoot(),
+        BrowserAnimationsModule,
+        BrowserModule,
+        AppRoutingModule,
+        FontAwesomeModule,
+        FormsModule
+    ],
   providers: [],
   bootstrap: [AppComponent]
 })

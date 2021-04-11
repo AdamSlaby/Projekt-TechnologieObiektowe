@@ -3,7 +3,7 @@ declare var mxPerimeter: any;
 declare var mxEdgeStyle: any;
 
 export abstract class Styles {
-  static getEntityStyle() {
+  static getColumnStyle() {
     const style = new Object();
     style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_RECTANGLE;
     style[mxConstants.STYLE_PERIMETER] = mxPerimeter.RectanglePerimeter;
@@ -48,5 +48,6 @@ export abstract class Styles {
     edge[mxConstants.HTML] = '1';
     edge[mxConstants.STYLE_ENDARROW] = mxConstants.EDGESTYLE_ENTITY_RELATION;
     edge[mxConstants.STYLE_STARTARROW] = mxConstants.ARROW_BLOCK;
+    edge[mxConstants.STYLE_ENDARROW] = mxConstants.ARROW_BLOCK;
   }
 }
