@@ -62,7 +62,12 @@ export class ContextMenu {
     const value = cell.value.clone();
     switch (type) {
       case Type.NOT_NULL: value.notNull = !value.notNull; break;
-      case Type.PRIMARY_KEY: value.primaryKey = !value.primaryKey; break;
+      case Type.PRIMARY_KEY: {
+        value.primaryKey = !value.primaryKey;
+        value.notNull = false;
+        value.unique = false;
+        break;
+      }
       case Type.UNIQUE: value.unique = !value.unique;
     }
     this.graph.getModel().setValue(cell, value);

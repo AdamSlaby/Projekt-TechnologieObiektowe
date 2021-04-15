@@ -8,10 +8,12 @@ import {AccordionModule} from 'ngx-bootstrap/accordion';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {FormsModule} from '@angular/forms';
+import { NameValidatorDirectiveDirective } from './validator/name-validator-directive.directive';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    NameValidatorDirectiveDirective
   ],
     imports: [
         TooltipModule.forRoot(),

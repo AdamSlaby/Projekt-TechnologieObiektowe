@@ -1,3 +1,5 @@
+import {NameValidator} from '../validator/name-validator';
+
 declare var mxGraph: any;
 declare var mxUtils: any;
 
@@ -35,7 +37,7 @@ export class Settings {
         return value.clone();
       } else {
         const oldName = cell.value.name;
-        if (value === '') {
+        if (value === '' || !NameValidator.validate(value)) {
           cell.value.name = oldName;
         } else {
           cell.value.name = value;

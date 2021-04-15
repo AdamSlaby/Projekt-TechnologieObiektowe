@@ -101,6 +101,10 @@ export class AppComponent implements AfterViewInit {
   }
 
   saveColumn() {
+    if (this.column.primaryKey) {
+      this.column.notNull = false;
+      this.column.unique = false;
+    }
     this.graph.getModel().setValue(this.chosenCell, this.column);
     this.isColumnClicked = false;
   }

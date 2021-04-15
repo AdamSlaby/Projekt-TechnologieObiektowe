@@ -47,10 +47,20 @@
                  name="columnName"
                  [ngClass] = "{'is-invalid': f.submitted && columnName.invalid}"
                  #columnName="ngModel"
-                 type="text" [value]="column.name" required/>
+                 type="text" [value]="column.name"
+                 required appForbiddenName maxlength="63" pattern="^[0-9a-zA-Z$_]+$"/>
           <div *ngIf = "f.submitted && columnName.invalid" class="invalid-feedback">
             <div *ngIf = "columnName.errors?.required">
               Musisz podać nazwę kolumny
+            </div>
+            <div *ngIf = "columnName.errors?.reservedWord">
+              Wpisałeś zarezerwowane słowo. Musisz podać inną nazwę
+            </div>
+            <div *ngIf = "columnName.errors?.maxlength">
+              Podana nazwa jest zbyt długa. Maksymalnie może mieć 63 znaki
+            </div>
+            <div *ngIf = "columnName.errors?.pattern">
+              Podana nazwa może zawierać tylko cyfry, podstawowe litery łacińskie, dolar i podkreślenie.
             </div>
           </div>
 
