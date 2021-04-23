@@ -9,6 +9,9 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {FormsModule} from '@angular/forms';
 import { NameValidatorDirectiveDirective } from './validator/name-validator-directive.directive';
+import {ButtonsModule} from 'ngx-bootstrap/buttons';
+import {BsDropdownModule} from 'ngx-bootstrap/dropdown';
+import {ModalModule} from 'ngx-bootstrap/modal';
 
 @NgModule({
   declarations: [
@@ -18,6 +21,9 @@ import { NameValidatorDirectiveDirective } from './validator/name-validator-dire
     imports: [
         TooltipModule.forRoot(),
         AccordionModule.forRoot(),
+        ButtonsModule.forRoot(),
+        BsDropdownModule.forRoot(),
+        ModalModule.forRoot(),
         BrowserAnimationsModule,
         BrowserModule,
         AppRoutingModule,

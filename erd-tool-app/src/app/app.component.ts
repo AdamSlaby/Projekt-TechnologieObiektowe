@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, TemplateRef, ViewChild} from '@angular/core';
 import {faProjectDiagram, faTable} from '@fortawesome/free-solid-svg-icons';
 import {Styles} from './styles/vertex-styles';
 import {Table} from './model/table';
@@ -6,11 +6,12 @@ import {Settings} from './settings/settings';
 import {ContextMenu} from './menu/context-menu';
 import {Utility} from './logic/utility';
 import {ColumnType} from './model/column-type';
+import {ArrowStyle} from './styles/arrow-style';
+import {Relation} from './enums/relation.enum';
+import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
 
-declare var mxGraph: any;
 declare var mxEditor: any;
 declare var mxEvent: any;
-declare var mxStackLayout: any;
 declare var mxRectangle: any;
 declare var mxSwimlane: any;
 
@@ -27,11 +28,18 @@ export class AppComponent implements AfterViewInit {
   columnTypes = ColumnType.getAllColumnTypes();
   column;
   chosenCell;
+  modalRef: BsModalRef;
   chosenTableName: string;
   graph;
   model;
+  sqlCode = '';
+  relation = Relation;
+  radioModel = 'OneToOne';
   settings: Settings;
   isColumnClicked = false;
+
+  constructor(private modalService: BsModalService) {
+  }
 
   @ViewChild('graphContainer') graphContainer: ElementRef;
   ngAfterViewInit() {
@@ -46,21 +54,16 @@ export class AppComponent implements AfterViewInit {
     this.settings.setLogicForCellValueChanged();
     this.settings.setValueForCell();
     this.settings.setVisibleLabels();
+    this.settings.setLayoutForSwimlane();
+    this.settings.setBehaviourOfRelationCreated();
+    this.settings.setDeletedEdgeListener();
+    this.addSideFormListener();
 
     this.graph.getStylesheet().putDefaultVertexStyle(Styles.getColumnStyle());
     this.graph.getStylesheet().putCellStyle('table', Styles.getTableStyle());
-    Styles.setEdgeStyle(this.graph);
+    ArrowStyle.getOneToManyArrow();
+    Styles.setOneToOneEdgeStyle(this.graph);
 
-    this.editor.createSwimlaneLayout = () => {
-      const layout = new mxStackLayout(this.graph, false);
-      layout.fill = true;
-      layout.resizeParent = true;
-
-      layout.isVertexMovable = (cell) => {
-        return true;
-      };
-      return layout;
-    };
 
     const menu = new ContextMenu(this.graph);
     menu.defineContextMenu();
@@ -68,22 +71,6 @@ export class AppComponent implements AfterViewInit {
     window.addEventListener('contextmenu', (evt) => {
       evt.preventDefault();
     }, false);
-
-    this.graph.addListener(mxEvent.CLICK, (sender, evt) => {
-
-      const cell = evt.getProperty('cell');
-      if (cell != null && !this.model.isEdge(cell) && !this.graph.isSwimlane(cell)) {
-        const table = Utility.getTableCell(this.graph, cell);
-        this.chosenTableName = table.value.name;
-        this.chosenCell = cell;
-        this.column = cell.value;
-        this.isColumnClicked = true;
-      } else {
-        this.isColumnClicked = false;
-      }
-      evt.consume();
-    });
-
   }
 
   addTableToGraph() {
@@ -107,5 +94,78 @@ export class AppComponent implements AfterViewInit {
     }
     this.graph.getModel().setValue(this.chosenCell, this.column);
     this.isColumnClicked = false;
+  }
+
+  changeRelationType(relation: Relation) {
+    switch (relation) {
+      case Relation.ONE_TO_ONE: Styles.setOneToOneEdgeStyle(this.graph); break;
+      case Relation.ONE_TO_MANY: Styles.setOneToManyEdgeStyle(this.graph); break;
+      case Relation.MANY_TO_MANY: Styles.setManyToManyEdgeStyle(this.graph);
+    }
+  }
+
+  addSideFormListener() {
+    this.graph.addListener(mxEvent.CLICK, (sender, evt) => {
+      const cell = evt.getProperty('cell');
+      const event = evt.getProperty('event');
+      if (cell != null && !this.model.isEdge(cell) && !this.graph.isSwimlane(cell)
+        && mxEvent.isLeftMouseButton(event) && !cell.value.foreignKey) {
+        const table = Utility.getTableCell(this.graph, cell);
+        this.chosenTableName = table.value.name;
+        this.chosenCell = cell;
+        this.column = cell.value;
+        this.isColumnClicked = true;
+      } else {
+        this.isColumnClicked = false;
+      }
+      evt.consume();
+    });
+  }
+
+  openModal(template: TemplateRef<any>) {
+    this.sqlCode = '';
+    this.generateSql();
+    this.modalRef = this.modalService.show(template);
+  }
+
+  generateSql() {
+    const parent = this.graph.getDefaultParent();
+    const childCount = this.model.getChildCount(parent);
+
+    for (let i = 0; i < childCount; i++) {
+      const child = this.model.getChildAt(parent, i);
+
+      if (!this.model.isEdge(child)) {
+        this.sqlCode += '\nCREATE TABLE IF NOT EXISTS ' + child.value.name + ' (';
+
+        const columnCount = this.model.getChildCount(child);
+
+        if (columnCount > 0) {
+          for (let j = 0; j < columnCount; j++) {
+            const column = this.model.getChildAt(child, j).value;
+
+            this.sqlCode += '\n\t' + column.name + ' ' + column.type;
+
+            if (column.notNull) {
+              this.sqlCode += ' NOT NULL';
+            }
+
+            if (column.primaryKey) {
+              this.sqlCode += ' PRIMARY KEY';
+            }
+
+            if (column.unique) {
+              this.sqlCode += ' UNIQUE';
+            }
+
+            this.sqlCode += ',';
+          }
+          this.sqlCode = this.sqlCode.slice(0, -1);
+          this.sqlCode += '\n);';
+        }
+
+        this.sqlCode += '\n';
+      }
+    }
   }
 }

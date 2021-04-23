@@ -3,6 +3,29 @@
   <header class="row bg-primary mb-2">
     <fa-icon [icon]="faProjectDiagram" size="2x" class="p-3"></fa-icon>
     <h3 class="my-auto">ERD designer</h3>
+    <div class="ml-3 navbar" dropdown placement="bottom right">
+      <a dropdownToggle class="dropdown-toggle my-auto menu-item" aria-controls="dropdown-alignment">
+        Plik <span class="caret"></span>
+      </a>
+      <ul *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-alignment">
+        <li role="menuitem">
+          <a class="dropdown-item" href="#" (click)="openModal(template)">Generuj sql</a>
+        </li>
+        <ng-template #template>
+          <div class="modal-header">
+            <h4 class="modal-title pull-left">Kod sql</h4>
+            <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <textarea disabled class="textarea" cols="60" rows="20">
+              {{ sqlCode }}
+            </textarea>
+          </div>
+        </ng-template>
+      </ul>
+    </div>
   </header>
 
   <section>
@@ -15,15 +38,24 @@
             </button>
           </accordion-group>
           <accordion-group heading="Relacje">
-            <button class="btn mr-2" tooltip="Jeden do jeden">
-              <img alt="one-to-one" src="assets/one-to-one.svg" width="50px" height="50px"/>
-            </button>
-            <button class="btn mr-2" tooltip="Jeden do wielu">
-              <img alt="one-to-many" src="assets/one-to-many.svg" width="50px" height="50px"/>
-            </button>
-            <button class="btn" tooltip="Wiele do wielu">
-              <img alt="many-to-many" src="assets/many-to-many.svg" width="50px" height="50px"/>
-            </button>
+            <div class="btn-group">
+              <label class="btn btn-light mr-2" (click)="changeRelationType(relation.ONE_TO_ONE)"
+                     [(ngModel)]="radioModel" btnRadio="OneToOne" tabindex="0"
+                     tooltip="Jeden do jeden">
+                <img alt="one-to-one" src="assets/one-to-one.svg" width="50px" height="50px"/>
+              </label>
+              <label (click)="changeRelationType(relation.ONE_TO_MANY)" class="btn btn-light mr-2" btnRadio="OneToMany"
+                     tabindex="0"
+                     [(ngModel)]="radioModel"
+                     tooltip="Jeden do wielu">
+                <img alt="one-to-many" src="assets/one-to-many.svg" width="50px" height="50px"/>
+              </label>
+              <label class="btn btn-light" [(ngModel)]="radioModel" (click)="changeRelationType(relation.MANY_TO_MANY)"
+                     btnRadio="ManyToMany" tabindex="0"
+                     tooltip="Wiele do wielu">
+                <img alt="many-to-many" src="assets/many-to-many.svg" width="50px" height="50px"/>
+              </label>
+            </div>
           </accordion-group>
           <accordion-group heading="Dziedziczenie">
             <button class="btn" tooltip="Relacja dziedziczenia">
@@ -45,21 +77,21 @@
                  id="nameInput"
                  [(ngModel)]="column.name"
                  name="columnName"
-                 [ngClass] = "{'is-invalid': f.submitted && columnName.invalid}"
+                 [ngClass]="{'is-invalid': f.submitted && columnName.invalid}"
                  #columnName="ngModel"
                  type="text" [value]="column.name"
                  required appForbiddenName maxlength="63" pattern="^[0-9a-zA-Z$_]+$"/>
-          <div *ngIf = "f.submitted && columnName.invalid" class="invalid-feedback">
-            <div *ngIf = "columnName.errors?.required">
+          <div *ngIf="f.submitted && columnName.invalid" class="invalid-feedback">
+            <div *ngIf="columnName.errors?.required">
               Musisz podać nazwę kolumny
             </div>
-            <div *ngIf = "columnName.errors?.reservedWord">
+            <div *ngIf="columnName.errors?.reservedWord">
               Wpisałeś zarezerwowane słowo. Musisz podać inną nazwę
             </div>
-            <div *ngIf = "columnName.errors?.maxlength">
+            <div *ngIf="columnName.errors?.maxlength">
               Podana nazwa jest zbyt długa. Maksymalnie może mieć 63 znaki
             </div>
-            <div *ngIf = "columnName.errors?.pattern">
+            <div *ngIf="columnName.errors?.pattern">
               Podana nazwa może zawierać tylko cyfry, podstawowe litery łacińskie, dolar i podkreślenie.
             </div>
           </div>

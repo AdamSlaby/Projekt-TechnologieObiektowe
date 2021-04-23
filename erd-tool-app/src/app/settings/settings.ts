@@ -1,7 +1,11 @@
 import {NameValidator} from '../validator/name-validator';
+import {Column} from '../model/column';
+import {ForeignKey} from '../model/foreign-key';
 
 declare var mxGraph: any;
 declare var mxUtils: any;
+declare var mxStackLayout: any;
+declare var mxEvent: any;
 
 export class Settings {
   graph;
@@ -16,6 +20,7 @@ export class Settings {
     this.graph.setConnectable(true);
     this.graph.setCellsDisconnectable(false);
     this.graph.setCellsCloneable(false);
+    this.graph.allowDanglingEdges = false;
     this.graph.swimlaneNesting = false;
     this.editor.layoutSwimlanes = true;
   }
@@ -27,6 +32,10 @@ export class Settings {
 
     this.graph.isCellMovable = (cell) => {
       return this.graph.isSwimlane(cell);
+    };
+
+    this.graph.isCellEditable = (cell) => {
+      return !this.graph.getModel().isEdge(cell);
     };
   }
 
@@ -47,6 +56,70 @@ export class Settings {
     };
   }
 
+  setLayoutForSwimlane() {
+    this.editor.createSwimlaneLayout = () => {
+      const layout = new mxStackLayout(this.graph, false);
+      layout.fill = true;
+      layout.resizeParent = true;
+
+      layout.isVertexMovable = (cell) => {
+        return true;
+      };
+      return layout;
+    };
+  }
+
+  setBehaviourOfRelationCreated() {
+    this.graph.addEdge = (edge, parent, source, target, index) => {
+      let primaryKey = null;
+      const childCount = this.graph.getModel().getChildCount(target);
+
+      for (let i = 0; i < childCount; i++) {
+        const child = this.graph.getModel().getChildAt(target, i);
+
+        if (child.value.primaryKey) {
+          primaryKey = child;
+          break;
+        }
+      }
+
+      if (primaryKey == null) {
+        mxUtils.alert('Docelowa tabela musi mieć klucz główny');
+        return null;
+      }
+
+      this.graph.getModel().beginUpdate();
+      try {
+        const column1 = this.graph.getModel().cloneCell(new Column('').getDefaultColumnCell());
+        column1.value.name = primaryKey.value.name + '_FK';
+        column1.value.type = primaryKey.value.type;
+        column1.value.foreignKey = new ForeignKey(target.value, primaryKey.value.name);
+
+        this.graph.addCell(column1, source);
+        source = column1;
+        target = primaryKey;
+
+        return this.graph.addCell(edge, parent, index, source, target);
+      } finally {
+        this.graph.getModel().endUpdate();
+      }
+      return null;
+    };
+  }
+
+  setDeletedEdgeListener() {
+    this.graph.addListener(mxEvent.REMOVE_CELLS, (sender, evt) => {
+      const cells = evt.getProperty('cells');
+
+      for (const cell of cells) {
+        if (this.graph.getModel().isEdge(cell)) {
+          const terminal = this.graph.getModel().getTerminal(cell, true);
+          this.graph.getModel().remove(terminal);
+        }
+      }
+    });
+  }
+
   setValueForCell() {
     this.graph.convertValueToString = (cell) => {
       if (cell.value != null && cell.value.name != null) {
@@ -63,6 +136,10 @@ export class Settings {
 
         if (cell.value.primaryKey) {
           label += '<img alt="primary key" src="assets/key.png" width="16" height="16" align="top">&nbsp;';
+        }
+
+        if (cell.value.foreignKey) {
+          label += '<img alt="primary key" src="assets/foreignKey.png" width="16" height="16" align="top">&nbsp;';
         }
 
         if (cell.value.unique) {

@@ -8,3 +8,18 @@
 .btn:hover {
   background-color: darkgray;
 }
+
+.menu-item {
+  font-size: 22px;
+  cursor: pointer;
+  color: black;
+}
+
+.menu-item:hover {
+  color: #393939 !important;
+}
+
+.textarea {
+  resize: none;
+  overflow: auto;
+}

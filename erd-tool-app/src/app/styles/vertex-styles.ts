@@ -38,16 +38,26 @@ export abstract class Styles {
     return table;
   }
 
-  static setEdgeStyle(graph) {
+  static setOneToOneEdgeStyle(graph) {
     const edge = graph.stylesheet.getDefaultEdgeStyle();
     edge[mxConstants.STYLE_LABEL_BACKGROUNDCOLOR] = '#FFFFFF';
     edge[mxConstants.STYLE_STROKEWIDTH] = '2';
     edge[mxConstants.STYLE_ROUNDED] = true;
-    edge[mxConstants.STYLE_EDGE] = mxEdgeStyle.entityRelationEdgeStyle;
-    edge[mxConstants.STYLE_FONTSIZE] = '12';
+    edge[mxConstants.STYLE_EDGE] = mxEdgeStyle.EntityRelation;
     edge[mxConstants.HTML] = '1';
-    edge[mxConstants.STYLE_ENDARROW] = mxConstants.EDGESTYLE_ENTITY_RELATION;
-    edge[mxConstants.STYLE_STARTARROW] = mxConstants.ARROW_BLOCK;
-    edge[mxConstants.STYLE_ENDARROW] = mxConstants.ARROW_BLOCK;
+    edge[mxConstants.STYLE_ENDARROW] = 'none';
+    edge[mxConstants.STYLE_STARTARROW] = 'none';
+  }
+
+  static setOneToManyEdgeStyle(graph) {
+    const edge = graph.stylesheet.getDefaultEdgeStyle();
+    edge[mxConstants.STYLE_ENDARROW] = 'oneToMany';
+    edge[mxConstants.STYLE_STARTARROW] = 'none';
+  }
+
+  static setManyToManyEdgeStyle(graph) {
+    const edge = graph.stylesheet.getDefaultEdgeStyle();
+    edge[mxConstants.STYLE_ENDARROW] = 'oneToMany';
+    edge[mxConstants.STYLE_STARTARROW] = 'oneToMany';
   }
 }

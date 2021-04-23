@@ -3,7 +3,6 @@ import {mxgraph} from 'mxgraph';
 import {Column} from '../model/column';
 import {CellType} from '../enums/cell-type.enum';
 import {Utility} from '../logic/utility';
-import {AppComponent} from '../app.component';
 
 export class ContextMenu {
   graph;
@@ -17,7 +16,7 @@ export class ContextMenu {
       if (cell != null) {
         switch (this.getCellType(cell)) {
           case CellType.TABLE: {
-            this.defineTableMenu(menu , cell);
+            this.defineTableMenu(menu, cell);
             break;
           }
           case CellType.COLUMN: {
@@ -38,14 +37,16 @@ export class ContextMenu {
     menu.addItem('Dodaj kolumnę', 'assets/add.png', () => this.addNewColumn(cell));
   }
 
-  private defineColumnMenu(menu, cell)  {
+  private defineColumnMenu(menu, cell) {
     menu.addItem('Dodaj kolumnę', 'assets/add.png', () => this.addNewColumn(cell));
     menu.addItem('Usuń kolumnę', 'assets/delete.png', () => this.deleteCell(cell));
-    menu.addItem('Primary key', this.setPropertyIcon(cell.value.primaryKey), () => this.changeColumnType(cell, Type.PRIMARY_KEY));
+    if (!cell.value.foreignKey) {
+      menu.addItem('Primary key', this.setPropertyIcon(cell.value.primaryKey), () => this.changeColumnType(cell, Type.PRIMARY_KEY));
 
-    if (!cell.value.primaryKey) {
-      menu.addItem('Unique', this.setPropertyIcon(cell.value.unique), () => this.changeColumnType(cell, Type.UNIQUE));
-      menu.addItem('Not null', this.setPropertyIcon(cell.value.notNull), () => this.changeColumnType(cell, Type.NOT_NULL));
+      if (!cell.value.primaryKey) {
+        menu.addItem('Unique', this.setPropertyIcon(cell.value.unique), () => this.changeColumnType(cell, Type.UNIQUE));
+        menu.addItem('Not null', this.setPropertyIcon(cell.value.notNull), () => this.changeColumnType(cell, Type.NOT_NULL));
+      }
     }
   }
 
@@ -61,14 +62,17 @@ export class ContextMenu {
   private changeColumnType(cell, type: Type) {
     const value = cell.value.clone();
     switch (type) {
-      case Type.NOT_NULL: value.notNull = !value.notNull; break;
+      case Type.NOT_NULL:
+        value.notNull = !value.notNull;
+        break;
       case Type.PRIMARY_KEY: {
         value.primaryKey = !value.primaryKey;
         value.notNull = false;
         value.unique = false;
         break;
       }
-      case Type.UNIQUE: value.unique = !value.unique;
+      case Type.UNIQUE:
+        value.unique = !value.unique;
     }
     this.graph.getModel().setValue(cell, value);
   }
