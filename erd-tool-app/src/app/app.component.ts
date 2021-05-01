@@ -42,9 +42,10 @@ export class AppComponent implements AfterViewInit {
   }
 
   @ViewChild('graphContainer') graphContainer: ElementRef;
+
   ngAfterViewInit() {
     this.editor.setGraphContainer(this.graphContainer.nativeElement);
-    this.graph =  this.editor.graph;
+    this.graph = this.editor.graph;
     this.model = this.graph.getModel();
 
     this.settings = new Settings(this.editor);
@@ -98,9 +99,14 @@ export class AppComponent implements AfterViewInit {
 
   changeRelationType(relation: Relation) {
     switch (relation) {
-      case Relation.ONE_TO_ONE: Styles.setOneToOneEdgeStyle(this.graph); break;
-      case Relation.ONE_TO_MANY: Styles.setOneToManyEdgeStyle(this.graph); break;
-      case Relation.MANY_TO_MANY: Styles.setManyToManyEdgeStyle(this.graph);
+      case Relation.ONE_TO_ONE:
+        Styles.setOneToOneEdgeStyle(this.graph);
+        break;
+      case Relation.ONE_TO_MANY:
+        Styles.setOneToManyEdgeStyle(this.graph);
+        break;
+      case Relation.MANY_TO_MANY:
+        Styles.setManyToManyEdgeStyle(this.graph);
     }
   }
 
@@ -124,13 +130,19 @@ export class AppComponent implements AfterViewInit {
 
   openModal(template: TemplateRef<any>) {
     this.sqlCode = '';
-    this.generateSql();
-    this.modalRef = this.modalService.show(template);
+    if (this.isErdValid()) {
+      this.generateSql();
+      this.modalRef = this.modalService.show(template);
+    } else {
+      alert('Nazwy tabel muszą być unikalne oraz nazwy kolumn w danej tabeli muszą być unikalne');
+      console.error('Nazwy tabel muszą być unikalne oraz nazwy kolumn w danej tabeli muszą być unikalne');
+    }
   }
 
   generateSql() {
     const parent = this.graph.getDefaultParent();
     const childCount = this.model.getChildCount(parent);
+    let relations = '';
 
     for (let i = 0; i < childCount; i++) {
       const child = this.model.getChildAt(parent, i);
@@ -158,6 +170,10 @@ export class AppComponent implements AfterViewInit {
               this.sqlCode += ' UNIQUE';
             }
 
+            if (column.foreignKey) {
+              relations += column.foreignKey.generateRelationInSql();
+            }
+
             this.sqlCode += ',';
           }
           this.sqlCode = this.sqlCode.slice(0, -1);
@@ -165,7 +181,40 @@ export class AppComponent implements AfterViewInit {
         }
 
         this.sqlCode += '\n';
+      } else if (this.model.isEdge(child) && Utility.isManyToManyRelation(this.graph.stylesheet.getDefaultEdgeStyle())) {
+        this.sqlCode += child.value.generateSql();
       }
     }
+    this.sqlCode += relations;
+  }
+
+  isErdValid(): boolean {
+    const parent = this.graph.getDefaultParent();
+    const childCount = this.model.getChildCount(parent);
+    const tableNames = new Set<string>();
+    const columnNames = new Set<string>();
+
+    for (let i = 0; i < childCount; i++) {
+      const child = this.model.getChildAt(parent, i);
+      if (!this.model.isEdge(child)) {
+        if (!tableNames.has(child.value.name)) {
+          tableNames.add(child.value.name);
+        } else {
+          return false;
+        }
+        const columnCount = this.model.getChildCount(child);
+
+        for (let j = 0; j < columnCount; j++) {
+          const column = this.model.getChildAt(child, j).value;
+          if (!columnNames.has(column.name)) {
+            columnNames.add(column.name);
+          } else {
+            return false;
+          }
+        }
+        columnNames.clear();
+      }
+    }
+    return true;
   }
 }

@@ -1,6 +1,8 @@
 import {NameValidator} from '../validator/name-validator';
 import {Column} from '../model/column';
 import {ForeignKey} from '../model/foreign-key';
+import {Utility} from '../logic/utility';
+import {Relation} from '../model/relation';
 
 declare var mxGraph: any;
 declare var mxUtils: any;
@@ -71,37 +73,35 @@ export class Settings {
 
   setBehaviourOfRelationCreated() {
     this.graph.addEdge = (edge, parent, source, target, index) => {
-      let primaryKey = null;
-      const childCount = this.graph.getModel().getChildCount(target);
+      if (!Utility.isManyToManyRelation(this.graph.stylesheet.getDefaultEdgeStyle())) {
+        const primaryKey = Utility.getTablePrimaryKey(this.graph, target);
 
-      for (let i = 0; i < childCount; i++) {
-        const child = this.graph.getModel().getChildAt(target, i);
-
-        if (child.value.primaryKey) {
-          primaryKey = child;
-          break;
+        if (primaryKey == null) {
+          mxUtils.alert('Docelowa tabela musi mieć klucz główny');
+          return null;
         }
-      }
 
-      if (primaryKey == null) {
-        mxUtils.alert('Docelowa tabela musi mieć klucz główny');
-        return null;
-      }
+        this.graph.getModel().beginUpdate();
+        try {
+          const column1 = this.graph.getModel().cloneCell(new Column('').getDefaultColumnCell());
+          column1.value.name = primaryKey.value.name + '_FK';
+          column1.value.type = primaryKey.value.type;
+          column1.value.foreignKey = new ForeignKey(target, primaryKey, source, column1);
 
-      this.graph.getModel().beginUpdate();
-      try {
-        const column1 = this.graph.getModel().cloneCell(new Column('').getDefaultColumnCell());
-        column1.value.name = primaryKey.value.name + '_FK';
-        column1.value.type = primaryKey.value.type;
-        column1.value.foreignKey = new ForeignKey(target.value, primaryKey.value.name);
+          this.graph.addCell(column1, source);
+          source = column1;
+          target = primaryKey;
 
-        this.graph.addCell(column1, source);
-        source = column1;
-        target = primaryKey;
+          return this.graph.addCell(edge, parent, index, source, target);
+        } finally {
+          this.graph.getModel().endUpdate();
+        }
+      } else {
+        const firstPrimaryKey = Utility.getTablePrimaryKey(this.graph, source);
+        const secondPrimaryKey = Utility.getTablePrimaryKey(this.graph, target);
 
+        edge.value = new Relation(source, target, firstPrimaryKey, secondPrimaryKey);
         return this.graph.addCell(edge, parent, index, source, target);
-      } finally {
-        this.graph.getModel().endUpdate();
       }
       return null;
     };

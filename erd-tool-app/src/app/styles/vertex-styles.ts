@@ -51,8 +51,8 @@ export abstract class Styles {
 
   static setOneToManyEdgeStyle(graph) {
     const edge = graph.stylesheet.getDefaultEdgeStyle();
-    edge[mxConstants.STYLE_ENDARROW] = 'oneToMany';
-    edge[mxConstants.STYLE_STARTARROW] = 'none';
+    edge[mxConstants.STYLE_ENDARROW] = 'none';
+    edge[mxConstants.STYLE_STARTARROW] = 'oneToMany';
   }
 
   static setManyToManyEdgeStyle(graph) {
