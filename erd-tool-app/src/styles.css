@@ -1,1 +1,27 @@
 /* You can add global styles to this file, and also import other style files */
+body div.mxPopupMenu {
+  background: white;
+  position: absolute;
+  border: 2px solid #bababa;
+  padding: 5px;
+}
+body table.mxPopupMenu {
+  border-collapse: collapse;
+  margin: 0;
+}
+body tr.mxPopupMenuItem {
+  color: black;
+  cursor: default;
+}
+body td.mxPopupMenuItem {
+  padding: 4px 30px 4px 30px;
+  font-size: 12pt;
+}
+body td.mxPopupMenuIcon {
+  background-color: white;
+  padding: 0;
+}
+body tr.mxPopupMenuItemHover {
+  background-color: #d5d5d5;
+  color: black;
+}

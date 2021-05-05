@@ -45,7 +45,7 @@ export class Settings {
     this.graph.getModel().valueForCellChanged = (cell, value) => {
       if (value.name != null) {
         cell.value = value;
-        return value.clone();
+        return value;
       } else {
         const oldName = cell.value.name;
         if (value === '' || !NameValidator.validate(value)) {
@@ -73,7 +73,15 @@ export class Settings {
 
   setBehaviourOfRelationCreated() {
     this.graph.addEdge = (edge, parent, source, target, index) => {
-      if (!Utility.isManyToManyRelation(this.graph.stylesheet.getDefaultEdgeStyle())) {
+      if (Utility.isManyToManyRelation(this.graph.stylesheet.getDefaultEdgeStyle())) {
+        const firstPrimaryKey = Utility.getTablePrimaryKey(this.graph, source);
+        const secondPrimaryKey = Utility.getTablePrimaryKey(this.graph, target);
+
+        edge.value = new Relation(source, target, firstPrimaryKey, secondPrimaryKey);
+        return this.graph.addCell(edge, parent, index, source, target);
+      } else if (Utility.isInheritanceRelation(this.graph.stylesheet.getDefaultEdgeStyle())) {
+        return this.graph.addCell(edge, parent, index, source, target);
+      } else {
         const primaryKey = Utility.getTablePrimaryKey(this.graph, target);
 
         if (primaryKey == null) {
@@ -90,18 +98,11 @@ export class Settings {
 
           this.graph.addCell(column1, source);
           source = column1;
-          target = primaryKey;
 
           return this.graph.addCell(edge, parent, index, source, target);
         } finally {
           this.graph.getModel().endUpdate();
         }
-      } else {
-        const firstPrimaryKey = Utility.getTablePrimaryKey(this.graph, source);
-        const secondPrimaryKey = Utility.getTablePrimaryKey(this.graph, target);
-
-        edge.value = new Relation(source, target, firstPrimaryKey, secondPrimaryKey);
-        return this.graph.addCell(edge, parent, index, source, target);
       }
       return null;
     };

@@ -25,13 +25,14 @@ export class AppComponent implements AfterViewInit {
   faTable = faTable;
   faProjectDiagram = faProjectDiagram;
   editor = new mxEditor();
-  columnTypes = ColumnType.getAllColumnTypes();
+  columnTypes = ColumnType.getAllColumnTypes().sort();
   column;
   chosenCell;
   modalRef: BsModalRef;
   chosenTableName: string;
   graph;
   model;
+  isForeignKeyClicked = false;
   sqlCode = '';
   relation = Relation;
   radioModel = 'OneToOne';
@@ -107,6 +108,9 @@ export class AppComponent implements AfterViewInit {
         break;
       case Relation.MANY_TO_MANY:
         Styles.setManyToManyEdgeStyle(this.graph);
+        break;
+      case Relation.INHERITANCE:
+        Styles.setInheritanceEdgeStyle(this.graph);
     }
   }
 
@@ -114,8 +118,7 @@ export class AppComponent implements AfterViewInit {
     this.graph.addListener(mxEvent.CLICK, (sender, evt) => {
       const cell = evt.getProperty('cell');
       const event = evt.getProperty('event');
-      if (cell != null && !this.model.isEdge(cell) && !this.graph.isSwimlane(cell)
-        && mxEvent.isLeftMouseButton(event) && !cell.value.foreignKey) {
+      if (Utility.isColumnClicked(cell, this.graph, event)) {
         const table = Utility.getTableCell(this.graph, cell);
         this.chosenTableName = table.value.name;
         this.chosenCell = cell;
@@ -181,7 +184,7 @@ export class AppComponent implements AfterViewInit {
         }
 
         this.sqlCode += '\n';
-      } else if (this.model.isEdge(child) && Utility.isManyToManyRelation(this.graph.stylesheet.getDefaultEdgeStyle())) {
+      } else if (this.model.isEdge(child) && child.value) {
         this.sqlCode += child.value.generateSql();
       }
     }

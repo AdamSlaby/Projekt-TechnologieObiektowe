@@ -23,9 +23,12 @@ export class ContextMenu {
             this.defineColumnMenu(menu, cell);
             break;
           }
+          case CellType.FOREIGN_KEY: {
+            this.defineForeignKeyMenu(menu, cell);
+            break;
+          }
           case CellType.RELATION: {
             this.defineRelationMenu(menu, cell);
-            break;
           }
         }
       }
@@ -40,12 +43,23 @@ export class ContextMenu {
   private defineColumnMenu(menu, cell) {
     menu.addItem('Dodaj kolumnę', 'assets/add.png', () => this.addNewColumn(cell));
     menu.addItem('Usuń kolumnę', 'assets/delete.png', () => this.deleteCell(cell));
-    if (!cell.value.foreignKey) {
-      menu.addItem('Primary key', this.setPropertyIcon(cell.value.primaryKey), () => this.changeColumnType(cell, Type.PRIMARY_KEY));
+    menu.addItem('Primary key', this.setPropertyIcon(cell.value.primaryKey), () => this.changeColumnType(cell, Type.PRIMARY_KEY));
+    if (!cell.value.primaryKey) {
+      menu.addItem('Unique', this.setPropertyIcon(cell.value.unique), () => this.changeColumnType(cell, Type.UNIQUE));
+      menu.addItem('Not null', this.setPropertyIcon(cell.value.notNull), () => this.changeColumnType(cell, Type.NOT_NULL));
+    }
+  }
 
-      if (!cell.value.primaryKey) {
-        menu.addItem('Unique', this.setPropertyIcon(cell.value.unique), () => this.changeColumnType(cell, Type.UNIQUE));
-        menu.addItem('Not null', this.setPropertyIcon(cell.value.notNull), () => this.changeColumnType(cell, Type.NOT_NULL));
+  private defineForeignKeyMenu(menu, cell) {
+    menu.addItem('Dodaj kolumnę', 'assets/add.png', () => this.addNewColumn(cell));
+    menu.addItem('Usuń kolumnę', 'assets/delete.png', () => this.deleteCell(cell));
+    const referenceColumns = Utility.getReferenceKeys(cell, this.graph);
+    if (referenceColumns.length > 1) {
+      menu.addSeparator();
+      const referenceColumnSubmenu = menu.addItem('Kolumna odniesienia', null, null);
+      for (const column of referenceColumns) {
+        menu.addItem(column.value.name, this.setReferenceColumnIcon(cell, column),
+          () => this.changeReferenceColumn(cell, column), referenceColumnSubmenu);
       }
     }
   }
@@ -80,7 +94,7 @@ export class ContextMenu {
   private addNewColumn(cell) {
     const parent = Utility.getTableCell(this.graph, cell);
     const columnObject = new Column('ColumnName');
-    columnObject.type = 'TEXT';
+    columnObject.type = 'VARCHAR(255)';
     const column = columnObject.getDefaultColumnCell();
     this.graph.getModel().beginUpdate();
     try {
@@ -88,6 +102,13 @@ export class ContextMenu {
     } finally {
       this.graph.getModel().endUpdate();
     }
+  }
+
+  private changeReferenceColumn(cell, referenceColumn) {
+    cell.value.foreignKey.referenceColumn = referenceColumn;
+    cell.value.type = referenceColumn.value.type;
+    cell.value.name = referenceColumn.value.name + '_FK';
+    this.graph.getModel().setValue(cell, cell.value);
   }
 
   private setPropertyIcon(property) {
@@ -98,9 +119,20 @@ export class ContextMenu {
     }
   }
 
+  private setReferenceColumnIcon(cell, column) {
+    if (cell.value.foreignKey.referenceColumn === column) {
+      return 'assets/correct.png';
+    } else {
+      return 'assets/wrong.png';
+    }
+  }
+
   getCellType(cell) {
-    if (!this.graph.isSwimlane(cell) && !this.graph.getModel().isEdge(cell)) {
+    if (!this.graph.isSwimlane(cell) && !this.graph.getModel().isEdge(cell) && !cell.value.foreignKey) {
       return CellType.COLUMN;
+    }
+    if (!this.graph.isSwimlane(cell) && !this.graph.getModel().isEdge(cell) && cell.value.foreignKey) {
+      return CellType.FOREIGN_KEY;
     }
     if (this.graph.getModel().isEdge(cell)) {
       return CellType.RELATION;

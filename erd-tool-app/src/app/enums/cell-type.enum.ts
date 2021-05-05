@@ -1,3 +1,3 @@
 export enum CellType {
-  TABLE, COLUMN, RELATION
+  TABLE, COLUMN, RELATION, FOREIGN_KEY
 }

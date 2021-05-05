@@ -41,23 +41,38 @@ export abstract class Styles {
   static setOneToOneEdgeStyle(graph) {
     const edge = graph.stylesheet.getDefaultEdgeStyle();
     edge[mxConstants.STYLE_LABEL_BACKGROUNDCOLOR] = '#FFFFFF';
+    edge[mxConstants.STYLE_STROKECOLOR] = '#000000';
     edge[mxConstants.STYLE_STROKEWIDTH] = '2';
     edge[mxConstants.STYLE_ROUNDED] = true;
     edge[mxConstants.STYLE_EDGE] = mxEdgeStyle.EntityRelation;
     edge[mxConstants.HTML] = '1';
     edge[mxConstants.STYLE_ENDARROW] = 'none';
     edge[mxConstants.STYLE_STARTARROW] = 'none';
+    edge[mxConstants.STYLE_ENDFILL] = '1';
+    edge[mxConstants.STYLE_ENDSIZE] = 'endSize';
   }
 
   static setOneToManyEdgeStyle(graph) {
     const edge = graph.stylesheet.getDefaultEdgeStyle();
     edge[mxConstants.STYLE_ENDARROW] = 'none';
     edge[mxConstants.STYLE_STARTARROW] = 'oneToMany';
+    edge[mxConstants.STYLE_ENDFILL] = '1';
+    edge[mxConstants.STYLE_ENDSIZE] = 'endSize';
   }
 
   static setManyToManyEdgeStyle(graph) {
     const edge = graph.stylesheet.getDefaultEdgeStyle();
     edge[mxConstants.STYLE_ENDARROW] = 'oneToMany';
     edge[mxConstants.STYLE_STARTARROW] = 'oneToMany';
+    edge[mxConstants.STYLE_ENDFILL] = '1';
+    edge[mxConstants.STYLE_ENDSIZE] = '5';
+  }
+
+  static setInheritanceEdgeStyle(graph) {
+    const edge = graph.stylesheet.getDefaultEdgeStyle();
+    edge[mxConstants.STYLE_ENDARROW] = 'block';
+    edge[mxConstants.STYLE_ENDFILL] = '0';
+    edge[mxConstants.STYLE_ENDSIZE] = '16';
+    edge[mxConstants.STYLE_STARTARROW] = 'none';
   }
 }

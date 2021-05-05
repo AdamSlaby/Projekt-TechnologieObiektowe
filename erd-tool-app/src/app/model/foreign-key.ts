@@ -1,4 +1,5 @@
 import {Utility} from '../logic/utility';
+declare var mxUtils: any;
 
 export class ForeignKey {
   referenceTable: any;
