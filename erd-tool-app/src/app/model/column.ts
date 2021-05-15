@@ -1,10 +1,11 @@
 import {ForeignKey} from './foreign-key';
+import {SqlGeneratorStrategy} from './sql-generator-strategy';
 
 declare var mxCell: any;
 declare var mxGeometry: any;
 declare var mxUtils: any;
 
-export class Column {
+export class Column implements SqlGeneratorStrategy {
   name: string;
   type: string;
   primaryKey: boolean;
@@ -34,6 +35,25 @@ export class Column {
     column.setVertex(true);
     column.setConnectable(false);
     return column;
+  }
+
+  generateSql(): string {
+    let sql = '';
+    sql += '\n\t' + this.name + ' ' + this.type;
+
+    if (this.primaryKey) {
+      sql += ' PRIMARY KEY';
+    }
+
+    if (this.unique) {
+      sql += ' UNIQUE';
+    }
+
+    if (this.notNull) {
+      sql += ' NOT NULL';
+    }
+    sql += ',';
+    return sql;
   }
 
   clone() {

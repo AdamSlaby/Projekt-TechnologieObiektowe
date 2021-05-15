@@ -1,6 +1,7 @@
 import {Utility} from '../logic/utility';
+import {SqlGeneratorStrategy} from './sql-generator-strategy';
 
-export class Relation {
+export class Relation implements SqlGeneratorStrategy {
   firstTable: any;
   secondTable: any;
   firstPrimaryKey: any;

@@ -63,7 +63,7 @@ export class AppComponent implements AfterViewInit {
 
     this.graph.getStylesheet().putDefaultVertexStyle(Styles.getColumnStyle());
     this.graph.getStylesheet().putCellStyle('table', Styles.getTableStyle());
-    ArrowStyle.getOneToManyArrow();
+    ArrowStyle.addOneToManyArrow();
     Styles.setOneToOneEdgeStyle(this.graph);
 
 
@@ -79,7 +79,7 @@ export class AppComponent implements AfterViewInit {
     this.graph.stopEditing(false);
     const parent = this.graph.getDefaultParent();
     const table = new Table('Entity');
-    const entity = this.model.cloneCell(table.getTableCell());
+    const entity = table.getTableCell();
     this.model.beginUpdate();
     try {
       this.graph.addCell(entity, parent);
@@ -150,39 +150,15 @@ export class AppComponent implements AfterViewInit {
     for (let i = 0; i < childCount; i++) {
       const child = this.model.getChildAt(parent, i);
 
-      if (!this.model.isEdge(child)) {
+      if (!this.model.isEdge(child) && !child.value.isAbstract) {
         this.sqlCode += '\nCREATE TABLE IF NOT EXISTS ' + child.value.name + ' (';
-
-        const columnCount = this.model.getChildCount(child);
-
-        if (columnCount > 0) {
-          for (let j = 0; j < columnCount; j++) {
-            const column = this.model.getChildAt(child, j).value;
-
-            this.sqlCode += '\n\t' + column.name + ' ' + column.type;
-
-            if (column.notNull) {
-              this.sqlCode += ' NOT NULL';
-            }
-
-            if (column.primaryKey) {
-              this.sqlCode += ' PRIMARY KEY';
-            }
-
-            if (column.unique) {
-              this.sqlCode += ' UNIQUE';
-            }
-
-            if (column.foreignKey) {
-              relations += column.foreignKey.generateRelationInSql();
-            }
-
-            this.sqlCode += ',';
-          }
-          this.sqlCode = this.sqlCode.slice(0, -1);
-          this.sqlCode += '\n);';
-        }
-
+        this.sqlCode += child.value.generateSql();
+        child.value.columns.forEach(column => {
+          if (column.foreignKey) {
+            relations += column.foreignKey.generateSql();
+          }});
+        this.sqlCode = this.sqlCode.slice(0, -1);
+        this.sqlCode += '\n);';
         this.sqlCode += '\n';
       } else if (this.model.isEdge(child) && child.value) {
         this.sqlCode += child.value.generateSql();

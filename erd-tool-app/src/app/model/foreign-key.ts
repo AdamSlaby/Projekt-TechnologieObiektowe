@@ -1,7 +1,8 @@
 import {Utility} from '../logic/utility';
+import {SqlGeneratorStrategy} from './sql-generator-strategy';
 declare var mxUtils: any;
 
-export class ForeignKey {
+export class ForeignKey implements SqlGeneratorStrategy {
   referenceTable: any;
   referenceColumn: any;
   sourceTable: any;
@@ -16,7 +17,7 @@ export class ForeignKey {
     this.constraint = Date.now().toString();
   }
 
-  generateRelationInSql(): string {
+  generateSql(): string {
     return Utility.getSqlRelation(this.sourceTable.value.name, this.column.value.name,
       this.referenceTable.value.name, this.referenceColumn.value.name, this.constraint);
   }

@@ -77,9 +77,19 @@ export class Settings {
         const firstPrimaryKey = Utility.getTablePrimaryKey(this.graph, source);
         const secondPrimaryKey = Utility.getTablePrimaryKey(this.graph, target);
 
+        if (firstPrimaryKey == null || secondPrimaryKey == null) {
+          mxUtils.alert('Obie tabele muszą mieć klucz główny');
+          return null;
+        }
+
         edge.value = new Relation(source, target, firstPrimaryKey, secondPrimaryKey);
         return this.graph.addCell(edge, parent, index, source, target);
       } else if (Utility.isInheritanceRelation(this.graph.stylesheet.getDefaultEdgeStyle())) {
+        target.value.setAbstract();
+        const primary = Utility.getTablePrimaryKey(this.graph, target);
+        this.graph.removeCells([primary]);
+        source.value.parent = target.value;
+
         return this.graph.addCell(edge, parent, index, source, target);
       } else {
         const primaryKey = Utility.getTablePrimaryKey(this.graph, target);
@@ -97,7 +107,9 @@ export class Settings {
           column1.value.foreignKey = new ForeignKey(target, primaryKey, source, column1);
 
           this.graph.addCell(column1, source);
+          source.value.addColumn(column1.value);
           source = column1;
+          target = primaryKey;
 
           return this.graph.addCell(edge, parent, index, source, target);
         } finally {
@@ -113,8 +125,9 @@ export class Settings {
       const cells = evt.getProperty('cells');
 
       for (const cell of cells) {
-        if (this.graph.getModel().isEdge(cell)) {
+        if (this.graph.getModel().isEdge(cell) && !cell.value) {
           const terminal = this.graph.getModel().getTerminal(cell, true);
+          Utility.getTableCell(this.graph, terminal).value.deleteColumn(terminal.value);
           this.graph.getModel().remove(terminal);
         }
       }

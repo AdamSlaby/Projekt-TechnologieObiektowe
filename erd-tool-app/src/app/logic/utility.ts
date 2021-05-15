@@ -55,6 +55,7 @@ export abstract class Utility {
         return child;
       }
     }
+    return null;
   }
 
   static getSqlRelation(firstTableName: string, firstColumnName: string,

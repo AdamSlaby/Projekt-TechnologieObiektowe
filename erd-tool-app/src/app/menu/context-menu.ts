@@ -68,13 +68,18 @@ export class ContextMenu {
     menu.addItem('Usuń relację', 'assets/delete.png', () => this.deleteCell(cell));
   }
 
-  private deleteCell(vertexID) {
-    const array = [vertexID];
+  private deleteCell(cell) {
+    const array = [cell];
+    const cellType = this.getCellType(cell);
+    if (cellType === CellType.COLUMN) {
+      const tableCell = Utility.getTableCell(this.graph, cell);
+      tableCell.value.deleteColumn(cell.value);
+    }
     this.graph.removeCells(array);
   }
 
   private changeColumnType(cell, type: Type) {
-    const value = cell.value.clone();
+    const value = cell.value;
     switch (type) {
       case Type.NOT_NULL:
         value.notNull = !value.notNull;
@@ -95,6 +100,7 @@ export class ContextMenu {
     const parent = Utility.getTableCell(this.graph, cell);
     const columnObject = new Column('ColumnName');
     columnObject.type = 'VARCHAR(255)';
+    parent.value.addColumn(columnObject);
     const column = columnObject.getDefaultColumnCell();
     this.graph.getModel().beginUpdate();
     try {
@@ -105,10 +111,17 @@ export class ContextMenu {
   }
 
   private changeReferenceColumn(cell, referenceColumn) {
-    cell.value.foreignKey.referenceColumn = referenceColumn;
-    cell.value.type = referenceColumn.value.type;
-    cell.value.name = referenceColumn.value.name + '_FK';
-    this.graph.getModel().setValue(cell, cell.value);
+    this.graph.getModel().beginUpdate();
+    try {
+      cell.value.foreignKey.referenceColumn = referenceColumn;
+      cell.value.type = referenceColumn.value.type;
+      cell.value.name = referenceColumn.value.name + '_FK';
+      const connections = this.graph.getModel().getConnections(cell);
+      this.graph.getModel().setTerminals(connections[0], cell, referenceColumn);
+      this.graph.getModel().setValue(cell, cell.value);
+    } finally {
+      this.graph.getModel().endUpdate();
+    }
   }
 
   private setPropertyIcon(property) {

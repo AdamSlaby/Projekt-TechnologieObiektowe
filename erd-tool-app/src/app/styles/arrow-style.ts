@@ -1,7 +1,7 @@
 declare var mxMarker: any;
 
 export abstract class ArrowStyle {
-  static getOneToManyArrow() {
+  static addOneToManyArrow() {
     mxMarker.addMarker('oneToMany', (canvas, shape, type, pe, unitX, unitY, size, source, sw, filled) => {
       const nx = unitX * (size + sw + 9);
       const ny = unitY * (size + sw + 9);
