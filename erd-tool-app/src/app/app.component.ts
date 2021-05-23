@@ -7,13 +7,13 @@ import {ContextMenu} from './menu/context-menu';
 import {Utility} from './logic/utility';
 import {ColumnType} from './model/column-type';
 import {ArrowStyle} from './styles/arrow-style';
-import {Relation} from './enums/relation.enum';
+import {Relations} from './enums/relation.enum';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
+import {Relation} from './model/relation';
 
 declare var mxEditor: any;
 declare var mxEvent: any;
 declare var mxRectangle: any;
-declare var mxSwimlane: any;
 
 @Component({
   selector: 'app-root',
@@ -34,7 +34,7 @@ export class AppComponent implements AfterViewInit {
   model;
   isForeignKeyClicked = false;
   sqlCode = '';
-  relation = Relation;
+  relation = Relations;
   radioModel = 'OneToOne';
   settings: Settings;
   isColumnClicked = false;
@@ -98,18 +98,18 @@ export class AppComponent implements AfterViewInit {
     this.isColumnClicked = false;
   }
 
-  changeRelationType(relation: Relation) {
+  changeRelationType(relation: Relations) {
     switch (relation) {
-      case Relation.ONE_TO_ONE:
+      case Relations.ONE_TO_ONE:
         Styles.setOneToOneEdgeStyle(this.graph);
         break;
-      case Relation.ONE_TO_MANY:
+      case Relations.ONE_TO_MANY:
         Styles.setOneToManyEdgeStyle(this.graph);
         break;
-      case Relation.MANY_TO_MANY:
+      case Relations.MANY_TO_MANY:
         Styles.setManyToManyEdgeStyle(this.graph);
         break;
-      case Relation.INHERITANCE:
+      case Relations.INHERITANCE:
         Styles.setInheritanceEdgeStyle(this.graph);
     }
   }
@@ -160,7 +160,7 @@ export class AppComponent implements AfterViewInit {
         this.sqlCode = this.sqlCode.slice(0, -1);
         this.sqlCode += '\n);';
         this.sqlCode += '\n';
-      } else if (this.model.isEdge(child) && child.value) {
+      } else if (this.model.isEdge(child) && child.value && child.value instanceof Relation) {
         this.sqlCode += child.value.generateSql();
       }
     }

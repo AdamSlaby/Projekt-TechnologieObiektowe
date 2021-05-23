@@ -1,3 +1,3 @@
 export interface SqlGeneratorStrategy {
-  generateSql(): string;
+  generateSql(isInherited?: boolean): string;
 }

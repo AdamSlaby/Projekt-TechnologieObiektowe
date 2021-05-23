@@ -38,6 +38,9 @@ export class ContextMenu {
   private defineTableMenu(menu, cell) {
     menu.addItem('Usuń tabelę', 'assets/delete.png', () => this.deleteCell(cell));
     menu.addItem('Dodaj kolumnę', 'assets/add.png', () => this.addNewColumn(cell));
+    if (this.checkInheritanceRelation(cell)) {
+      menu.addItem('Ustaw abstrakcję', this.setPropertyIcon(cell.value.isAbstract), () => this.setAbstract(cell));
+    }
   }
 
   private defineColumnMenu(menu, cell) {
@@ -151,5 +154,22 @@ export class ContextMenu {
       return CellType.RELATION;
     }
     return CellType.TABLE;
+  }
+
+  private setAbstract(cell) {
+    cell.value.setAbstract();
+    const primaryKey = Utility.getTablePrimaryKey(this.graph, cell);
+    this.graph.removeCells([primaryKey]);
+  }
+
+  private checkInheritanceRelation(cell): boolean {
+    const connections = this.graph.getModel().getConnections(cell);
+    let hasInheritance = false;
+    connections.forEach(con => {
+      if (con.value === 'Inheritance') {
+        hasInheritance = true;
+      }
+    });
+    return hasInheritance;
   }
 }

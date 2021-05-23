@@ -27,8 +27,10 @@ export class Table implements SqlGeneratorStrategy {
   }
 
   setAbstract() {
-    this.isAbstract = true;
-    this.columns = this.columns.filter(col => col.primaryKey !== true);
+    this.isAbstract = !this.isAbstract;
+    if (this.isAbstract) {
+      this.columns = this.columns.filter(col => col.primaryKey !== true);
+    }
   }
 
   getTableCell() {
@@ -43,11 +45,16 @@ export class Table implements SqlGeneratorStrategy {
     return table;
   }
 
-  generateSql(): string {
+  generateSql(isInherited?: boolean): string {
     let sql = '';
-    this.columns.forEach(column => sql += column.generateSql());
+    this.columns.forEach(column => {
+      if (column.primaryKey && isInherited) {
+      } else {
+        sql += column.generateSql();
+      }
+    });
     if (this.parent) {
-      sql += this.parent.generateSql();
+      sql += this.parent.generateSql(true);
     }
     return sql;
   }

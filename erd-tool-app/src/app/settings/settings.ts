@@ -3,6 +3,7 @@ import {Column} from '../model/column';
 import {ForeignKey} from '../model/foreign-key';
 import {Utility} from '../logic/utility';
 import {Relation} from '../model/relation';
+import {Styles} from '../styles/vertex-styles';
 
 declare var mxGraph: any;
 declare var mxUtils: any;
@@ -72,8 +73,13 @@ export class Settings {
   }
 
   setBehaviourOfRelationCreated() {
+    const style = this.graph.stylesheet.getDefaultEdgeStyle();
     this.graph.addEdge = (edge, parent, source, target, index) => {
       if (Utility.isManyToManyRelation(this.graph.stylesheet.getDefaultEdgeStyle())) {
+        if (source.value.isAbstract || target.value.isAbstract) {
+          mxUtils.alert('Żadna z tabel nie może być abstrakcyjna');
+          return null;
+        }
         const firstPrimaryKey = Utility.getTablePrimaryKey(this.graph, source);
         const secondPrimaryKey = Utility.getTablePrimaryKey(this.graph, target);
 
@@ -82,16 +88,20 @@ export class Settings {
           return null;
         }
 
+        edge.setStyle(style.toString());
         edge.value = new Relation(source, target, firstPrimaryKey, secondPrimaryKey);
         return this.graph.addCell(edge, parent, index, source, target);
       } else if (Utility.isInheritanceRelation(this.graph.stylesheet.getDefaultEdgeStyle())) {
-        target.value.setAbstract();
-        const primary = Utility.getTablePrimaryKey(this.graph, target);
-        this.graph.removeCells([primary]);
         source.value.parent = target.value;
+        edge.value = 'Inheritance';
+        edge.setStyle(style.toString());
 
         return this.graph.addCell(edge, parent, index, source, target);
       } else {
+        if (source.value.isAbstract || target.value.isAbstract) {
+          mxUtils.alert('Żadna z tabel nie może być abstrakcyjna');
+          return null;
+        }
         const primaryKey = Utility.getTablePrimaryKey(this.graph, target);
 
         if (primaryKey == null) {
@@ -106,6 +116,7 @@ export class Settings {
           column1.value.type = primaryKey.value.type;
           column1.value.foreignKey = new ForeignKey(target, primaryKey, source, column1);
 
+          edge.setStyle(style.toString());
           this.graph.addCell(column1, source);
           source.value.addColumn(column1.value);
           source = column1;
