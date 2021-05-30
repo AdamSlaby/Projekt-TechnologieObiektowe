@@ -56,7 +56,22 @@ export class Column implements SqlGeneratorStrategy {
     return sql;
   }
 
-  clone() {
-    return mxUtils.clone(this);
+  setFields(column: Column): void {
+    this.name = column.name;
+    this.type = column.type;
+    this.primaryKey = column.primaryKey;
+    this.foreignKey = column.foreignKey;
+    this.notNull = column.notNull;
+    this.unique = column.unique;
+  }
+
+  clone(): Column {
+    const col = new Column(this.name);
+    col.type = this.type;
+    col.primaryKey = this.primaryKey;
+    col.foreignKey = this.foreignKey;
+    col.notNull = this.notNull;
+    col.unique = this.unique;
+    return col;
   }
 }

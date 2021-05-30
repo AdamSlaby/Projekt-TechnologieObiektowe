@@ -1,7 +1,7 @@
 export abstract class ColumnType {
   static getAllColumnTypes() {
-    return ['CHAR(1)', 'VARCHAR(255)', 'BINARY(1)', 'VARBINARY(255)', 'TINYBLOB', 'TINYTEXT', 'TEXT', 'BLOB',
-      'MEDIUMTEXT', 'MEDIUMBLOB', 'LONGTEXT', 'LONGBLOB', 'BIT(1)', 'TINYINT(255)', 'BOOL', 'BOOLEAN', 'SMALLINT(255)', 'MEDIUMINT(255)',
-      'INT', 'BIGINT(255)', 'FLOAT(10,2)', 'DOUBLE(10,4)', 'DECIMAL(10,2)', 'DATE', 'DATETIME', 'TIME'];
+    return ['CHAR(255)', 'VARCHAR(255)', 'BINARY(32)', 'VARBINARY(255)', 'TINYBLOB', 'TINYTEXT', 'TEXT', 'BLOB',
+      'MEDIUMTEXT', 'MEDIUMBLOB', 'LONGTEXT', 'LONGBLOB', 'BIT(8)', 'TINYINT', 'BOOLEAN', 'MEDIUMINT',
+      'INT', 'BIGINT', 'FLOAT(24)', 'DOUBLE', 'DECIMAL(9,2)', 'DATE', 'DATETIME', 'TIME'];
   }
 }

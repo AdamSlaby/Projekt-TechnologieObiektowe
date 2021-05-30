@@ -3,7 +3,6 @@ import {Column} from '../model/column';
 import {ForeignKey} from '../model/foreign-key';
 import {Utility} from '../logic/utility';
 import {Relation} from '../model/relation';
-import {Styles} from '../styles/vertex-styles';
 
 declare var mxGraph: any;
 declare var mxUtils: any;
@@ -45,8 +44,11 @@ export class Settings {
   setLogicForCellValueChanged() {
     this.graph.getModel().valueForCellChanged = (cell, value) => {
       if (value.name != null) {
-        cell.value = value;
-        return value;
+        if (NameValidator.validate(value.name)) {
+          cell.value.setFields(value);
+          return cell.value;
+        }
+        return cell.value;
       } else {
         const oldName = cell.value.name;
         if (value === '' || !NameValidator.validate(value)) {

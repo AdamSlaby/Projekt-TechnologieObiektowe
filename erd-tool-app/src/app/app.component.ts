@@ -10,6 +10,7 @@ import {ArrowStyle} from './styles/arrow-style';
 import {Relations} from './enums/relation.enum';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
 import {Relation} from './model/relation';
+import {Column} from './model/column';
 
 declare var mxEditor: any;
 declare var mxEvent: any;
@@ -26,7 +27,7 @@ export class AppComponent implements AfterViewInit {
   faProjectDiagram = faProjectDiagram;
   editor = new mxEditor();
   columnTypes = ColumnType.getAllColumnTypes().sort();
-  column;
+  column: Column;
   chosenCell;
   modalRef: BsModalRef;
   chosenTableName: string;
@@ -122,7 +123,7 @@ export class AppComponent implements AfterViewInit {
         const table = Utility.getTableCell(this.graph, cell);
         this.chosenTableName = table.value.name;
         this.chosenCell = cell;
-        this.column = cell.value;
+        this.column = cell.value.clone();
         this.isColumnClicked = true;
       } else {
         this.isColumnClicked = false;
