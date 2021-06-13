@@ -77,6 +77,9 @@ export class ContextMenu {
     if (cellType === CellType.COLUMN) {
       const tableCell = Utility.getTableCell(this.graph, cell);
       tableCell.value.deleteColumn(cell.value);
+    } else if (cellType === CellType.TABLE && this.checkInheritanceRelation(cell)) {
+      cell.value.deleteAllColumns();
+      cell.value.parent = null;
     }
     this.graph.removeCells(array);
   }

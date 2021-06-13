@@ -29,7 +29,6 @@ export abstract class Styles {
     table[mxConstants.STYLE_STROKEWIDTH] = '2';
     table[mxConstants.STYLE_FONTCOLOR] = '#000000';
     table[mxConstants.STYLE_VERTICAL_ALIGN] = 'middle';
-    table[mxConstants.STYLE_STROKEWIDTH] = '2';
     table[mxConstants.STYLE_STARTSIZE] = '30';
     table[mxConstants.STYLE_FONTSIZE] = '15';
     table[mxConstants.SHADOW_OPACITY] = 0.5;

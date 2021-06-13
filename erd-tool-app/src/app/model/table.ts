@@ -26,6 +26,10 @@ export class Table implements SqlGeneratorStrategy {
     this.columns = this.columns.filter(col => col !== column);
   }
 
+  deleteAllColumns() {
+    this.columns = [];
+  }
+
   setAbstract() {
     this.isAbstract = !this.isAbstract;
     if (this.isAbstract) {

@@ -152,7 +152,7 @@ export class Settings {
       if (cell.value != null && cell.value.name != null) {
         return cell.value.name;
       }
-      return mxGraph.prototype.convertValueToString.apply(this, arguments);
+      return null;
     };
   }
 
